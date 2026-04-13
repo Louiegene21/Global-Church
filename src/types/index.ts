@@ -11,16 +11,24 @@ export interface Pastor {
   };
 }
 
-export interface Sermon {
-  id: string;
+export interface SpeakerType {
+  id: string | number;
+  first_name: string;
+  last_name: string;
+  image_url?: string;
+}
+
+export interface SermonType {
+  id?: number; 
   title: string;
-  speaker: string;
+  speaker_id: string;
+  speaker?: SpeakerType;
   date: string;
-  videoUrl?: string;
-  audioUrl?: string;
-  thumbnailUrl: string;
+  duration: string;
   description: string;
-  category: string;
+  watch_url: string;
+  image_url_address: string; 
+  image_url: string;
 }
 
 export interface Event {

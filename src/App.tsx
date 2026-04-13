@@ -13,6 +13,7 @@ import Login from './pages/public/Login';
 
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
+import Sermons from './pages/admin/Sermons';
 
 import { authService } from './services/api/authService';
 
@@ -63,7 +64,7 @@ const App: React.FC = () => {
                   <Routes>
                     <Route index element={<Navigate to="/admin/dashboard" replace />} />
                     <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="sermons" element={<Dashboard />} />
+                    <Route path="sermons" element={<Sermons />} />
                     <Route path="pastors" element={<Dashboard />} />
                     <Route path="events" element={<Dashboard />} />
                     <Route path="ministries" element={<Dashboard />} />
