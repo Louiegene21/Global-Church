@@ -1,13 +1,13 @@
 import React from 'react';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Button, 
-  Grid, 
-  Card, 
-  CardContent, 
-  Stack, 
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  Stack,
   Paper,
   Chip
 } from '@mui/material';
@@ -20,11 +20,11 @@ const Home: React.FC = () => {
   return (
     <Box>
       {/* Hero Section */}
-      <Box 
-        sx={{ 
-          height: '80vh', 
-          display: 'flex', 
-          alignItems: 'center', 
+      <Box
+        sx={{
+          height: '80vh',
+          display: 'flex',
+          alignItems: 'center',
           background: 'linear-gradient(rgba(33, 150, 243, 0.8), rgba(255, 255, 255, 0.9)), url("https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=1600&auto=format&fit=crop") center/cover no-repeat',
           position: 'relative'
         }}
@@ -36,10 +36,10 @@ const Home: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <Typography variant="h1" sx={{ color: 'primary.dark', mb: 2, fontWeight: 900 }}>
-              Global Family Church
+              Global Family Jesus Christ the Redeemer Church
             </Typography>
             <Typography variant="h4" sx={{ color: 'text.secondary', mb: 4, maxWidth: '600px' }}>
-              Where every soul finds a home and every heart finds hope in Jesus Christ.
+              "Jesus looked at them and said, 'With man this is impossible, but with God all things are possible'" - Matthew 19:26:
             </Typography>
             <Stack direction="row" spacing={2}>
               <Button variant="contained" size="large">Watch Services</Button>
@@ -102,8 +102,8 @@ const Home: React.FC = () => {
             <Button variant="text" color="primary" sx={{ fontWeight: 'bold' }}>Read More about our vision →</Button>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Box 
-              component="img" 
+            <Box
+              component="img"
               src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&auto=format&fit=crop"
               sx={{ width: '100%', borderRadius: 4, boxShadow: 10 }}
             />
