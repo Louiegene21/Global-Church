@@ -6,6 +6,7 @@ import theme from './theme';
 // Layouts
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import AdminLayout from './components/layout/AdminLayout';
 
 // Public Pages
 import Home from './pages/public/Home';
@@ -14,6 +15,11 @@ import Login from './pages/public/Login';
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
 import Sermons from './pages/admin/Sermons';
+import Speakers from './pages/admin/Speakers';
+import Members from './pages/admin/Members';
+import Ministries from './pages/admin/Ministries';
+import Events from './pages/admin/Events';
+import Announcements from './pages/admin/Announcements';
 
 import { authService } from './services/api/authService';
 
@@ -61,15 +67,19 @@ const App: React.FC = () => {
               path="/admin/*" 
               element={
                 <ProtectedRoute>
-                  <Routes>
-                    <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="sermons" element={<Sermons />} />
-                    <Route path="pastors" element={<Dashboard />} />
-                    <Route path="events" element={<Dashboard />} />
-                    <Route path="ministries" element={<Dashboard />} />
-                    <Route path="announcements" element={<Dashboard />} />
-                  </Routes>
+                  <AdminLayout>
+                    <Routes>
+                      <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                      <Route path="dashboard" element={<Dashboard />} />
+                      <Route path="sermons" element={<Sermons />} />
+                      <Route path="speakers" element={<Speakers />} />
+                      <Route path="members" element={<Members />} />
+                      <Route path="pastors" element={<Dashboard />} />
+                      <Route path="events" element={<Events />} />
+                      <Route path="ministries" element={<Ministries />} />
+                      <Route path="announcements" element={<Announcements />} />
+                    </Routes>
+                  </AdminLayout>
                 </ProtectedRoute>
               } 
             />

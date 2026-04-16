@@ -14,7 +14,11 @@ export interface Pastor {
 export interface SpeakerType {
   id: string | number;
   first_name: string;
+  middle_name?: string;
   last_name: string;
+  suffix?: string;
+  gender?: string;
+  date_of_birth?: string;
   image_url?: string;
 }
 
@@ -61,4 +65,19 @@ export interface User {
   id: string;
   username: string;
   role: 'admin' | 'user';
+}
+
+export interface MemberType {
+  id: string | number;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  suffix?: string;
+  gender: string;
+  date_of_birth?: string;
+  address?: string;
+  contact_number?: string;
+  email?: string;
+  membership_date?: string;
+  image_url?: string;
 }
