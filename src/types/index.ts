@@ -20,19 +20,24 @@ export interface SpeakerType {
   gender?: string;
   date_of_birth?: string;
   image_url?: string;
+  role?: string;
+  bio?: string;
 }
 
 export interface SermonType {
-  id?: number; 
+  id: string | number;
   title: string;
-  speaker_id: string;
-  speaker?: SpeakerType;
+  speaker_id?: string | number;
+  speaker?: string; // For simple mock data
+  speaker_details?: SpeakerType;
   date: string;
-  duration: string;
+  duration?: string;
   description: string;
-  watch_url: string;
-  image_url_address: string; 
-  image_url: string;
+  watch_url?: string;
+  thumbnail_url?: string;
+  image_url?: string; // Legacy compatibility
+  image_url_address?: string; // Legacy compatibility
+  category?: string;
 }
 
 export interface Event {

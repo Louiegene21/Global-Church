@@ -12,14 +12,19 @@ import AdminLayout from './components/layout/AdminLayout';
 import Home from './pages/public/Home';
 import Login from './pages/public/Login';
 import About from './pages/public/About';
+import Sermons from './pages/public/Sermons';
+import Pastors from './pages/public/Pastors';
+import Events from './pages/public/Events';
+import Ministries from './pages/public/Ministries';
+import Contact from './pages/public/Contact';
 
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
-import Sermons from './pages/admin/Sermons';
-import Speakers from './pages/admin/Speakers';
+import AdminSermons from './pages/admin/Sermons';
+import AdminSpeakers from './pages/admin/Speakers';
 import Members from './pages/admin/Members';
-import Ministries from './pages/admin/Ministries';
-import Events from './pages/admin/Events';
+import AdminMinistries from './pages/admin/Ministries';
+import AdminEvents from './pages/admin/Events';
 import Announcements from './pages/admin/Announcements';
 
 import { authService } from './services/api/authService';
@@ -55,13 +60,11 @@ const App: React.FC = () => {
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            
-            {/* Placeholder routes for now */}
-            <Route path="/sermons" element={<div style={{ padding: '100px', textAlign: 'center' }}>Sermons Page Coming Soon</div>} />
-            <Route path="/pastors" element={<div style={{ padding: '100px', textAlign: 'center' }}>Pastors Page Coming Soon</div>} />
-            <Route path="/events" element={<div style={{ padding: '100px', textAlign: 'center' }}>Events Page Coming Soon</div>} />
-            <Route path="/ministries" element={<div style={{ padding: '100px', textAlign: 'center' }}>Ministries Page Coming Soon</div>} />
-            <Route path="/contact" element={<div style={{ padding: '100px', textAlign: 'center' }}>Contact Page Coming Soon</div>} />
+            <Route path="/sermons" element={<Sermons />} />
+            <Route path="/pastors" element={<Pastors />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/ministries" element={<Ministries />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
 
             {/* Protected Admin Routes */}
@@ -73,12 +76,12 @@ const App: React.FC = () => {
                     <Routes>
                       <Route index element={<Navigate to="/admin/dashboard" replace />} />
                       <Route path="dashboard" element={<Dashboard />} />
-                      <Route path="sermons" element={<Sermons />} />
-                      <Route path="speakers" element={<Speakers />} />
+                      <Route path="sermons" element={<AdminSermons />} />
+                      <Route path="speakers" element={<AdminSpeakers />} />
                       <Route path="members" element={<Members />} />
                       <Route path="pastors" element={<Dashboard />} />
-                      <Route path="events" element={<Events />} />
-                      <Route path="ministries" element={<Ministries />} />
+                      <Route path="events" element={<AdminEvents />} />
+                      <Route path="ministries" element={<AdminMinistries />} />
                       <Route path="announcements" element={<Announcements />} />
                     </Routes>
                   </AdminLayout>

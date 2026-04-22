@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   Box,
   Container,
@@ -84,178 +85,242 @@ const About: React.FC = () => {
         }}
       >
         <Container maxWidth="md">
-          <Typography
-            variant="overline"
-            sx={{
-              fontWeight: 800,
-              letterSpacing: 4,
-              color: 'rgba(255,255,255,0.7)',
-              display: 'block',
-              textAlign: 'center',
-              mb: 2
-            }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            OUR IDENTITY & MISSION
-          </Typography>
-          <Typography
-            variant="h2"
-            component="h1"
-            sx={{
-              textAlign: 'center',
-              fontWeight: 800,
-              mb: 4,
-              fontSize: { xs: '2.2rem', sm: '3rem', md: '3.5rem' }
-            }}
-          >
-            Global Family Jesus Christ the Redeemer Church
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              textAlign: 'center',
-              lineHeight: 1.8,
-              fontWeight: 400,
-              opacity: 0.95,
-              maxWidth: '850px',
-              mx: 'auto'
-            }}
-          >
-            A Full Gospel Non-denominational Christian Church that believes the church is called as a corporate body of Christ Jesus moving in Apostolic, Prophetic, Evangelism, Pastoring and Teaching. The church is devoted to reaching out to the lost and training them to become future leaders and ministers of God.
-          </Typography>
+            <Typography
+              variant="overline"
+              sx={{
+                fontWeight: 800,
+                letterSpacing: 4,
+                color: 'rgba(255,255,255,0.7)',
+                display: 'block',
+                textAlign: 'center',
+                mb: 2
+              }}
+            >
+              OUR IDENTITY & MISSION
+            </Typography>
+            <Typography
+              variant="h2"
+              component="h1"
+              sx={{
+                textAlign: 'center',
+                fontWeight: 800,
+                mb: 4,
+                fontSize: { xs: '2.2rem', sm: '3rem', md: '3.5rem' }
+              }}
+            >
+              Global Family Jesus Christ the Redeemer Church
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                textAlign: 'center',
+                lineHeight: 1.8,
+                fontWeight: 400,
+                opacity: 0.95,
+                maxWidth: '850px',
+                mx: 'auto'
+              }}
+            >
+              A Full Gospel Non-denominational Christian Church that believes the church is called as a corporate body of Christ Jesus moving in Apostolic, Prophetic, Evangelism, Pastoring and Teaching. The church is devoted to reaching out to the lost and training them to become future leaders and ministers of God.
+            </Typography>
+          </motion.div>
         </Container>
       </Box>
 
       {/* Our Beliefs Section */}
       <Container maxWidth="lg" sx={{ mt: -8, position: 'relative', zIndex: 2 }}>
-        <Paper
-          elevation={0}
-          sx={{
-            borderRadius: 4,
-            p: { xs: 4, md: 8 },
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.12)',
-            border: '1px solid rgba(0,0,0,0.03)'
-          }}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <Typography
-            variant="h3"
-            sx={{ textAlign: 'center', mb: 8, fontWeight: 800, color: 'primary.main' }}
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              p: { xs: 4, md: 8 },
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.12)',
+              border: '1px solid rgba(0,0,0,0.03)'
+            }}
           >
-            Our Beliefs
-          </Typography>
-          <Grid container spacing={6}>
-            {beliefs.map((belief, index) => (
-              <Grid item xs={12} md={6} key={index}>
-                <Box sx={{ display: 'flex', gap: 3 }}>
-                  <Avatar
-                    sx={{
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      color: 'primary.main',
-                      width: 48,
-                      height: 48
-                    }}
+            <Typography
+              variant="h3"
+              sx={{ textAlign: 'center', mb: 8, fontWeight: 800, color: 'primary.main' }}
+            >
+              Our Beliefs
+            </Typography>
+            <Grid container spacing={6}>
+              {beliefs.map((belief, index) => (
+                <Grid item xs={12} md={6} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.1 * index }}
                   >
-                    <VerifiedIcon />
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-                      {belief.title}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                      {belief.text}
-                    </Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                      {belief.reference}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
+                    <Box sx={{ display: 'flex', gap: 3 }}>
+                      <Avatar
+                        sx={{
+                          bgcolor: alpha(theme.palette.primary.main, 0.1),
+                          color: 'primary.main',
+                          width: 48,
+                          height: 48
+                        }}
+                      >
+                        <VerifiedIcon />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+                          {belief.title}
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                          {belief.text}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                          {belief.reference}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          </Paper>
+        </motion.div>
       </Container>
 
       {/* Pillars */}
       <Container maxWidth={false} sx={{ mt: 15, px: { xs: 4, md: 6, lg: 10 } }}>
-        <Box sx={{ mb: 8, textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ mb: 2, fontWeight: 800 }}>
-            Pillars of Maturity
-          </Typography>
-          <Box sx={{ width: 80, height: 4, bgcolor: 'primary.main', mx: 'auto', borderRadius: 2, mb: 3 }} />
-          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '700px', mx: 'auto' }}>
-            Foundational principles that guide our spiritual journey and catalyze our growth as faithful followers of Christ.
-          </Typography>
-        </Box>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(4, 1fr)'
-            },
-            gap: 4
-          }}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
         >
-          {pillars.map((pillar, index) => (
-            <Card key={index} sx={{ borderRadius: 4, textAlign: 'center' }}>
-              <CardContent>
-                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', width: 90, height: 90, mx: 'auto', mb: 3 }}>
-                  {pillar.icon}
-                </Avatar>
-                <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                  {pillar.title}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {pillar.description}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
+          <Box sx={{ mb: 8, textAlign: 'center' }}>
+            <Typography variant="h3" sx={{ mb: 2, fontWeight: 800 }}>
+              Pillars of Maturity
+            </Typography>
+            <Box sx={{ width: 80, height: 4, bgcolor: 'primary.main', mx: 'auto', borderRadius: 2, mb: 3 }} />
+            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '700px', mx: 'auto' }}>
+              Foundational principles that guide our spiritual journey and catalyze our growth as faithful followers of Christ.
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(4, 1fr)'
+              },
+              gap: 4
+            }}
+          >
+            {pillars.map((pillar, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 * index }}
+              >
+                <Card sx={{ 
+                  borderRadius: 4, 
+                  textAlign: 'center', 
+                  height: '100%',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-8px)'
+                  }
+                }}>
+                  <CardContent>
+                    <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', width: 90, height: 90, mx: 'auto', mb: 3 }}>
+                      {pillar.icon}
+                    </Avatar>
+                    <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                      {pillar.title}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      {pillar.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </Box>
+        </motion.div>
       </Container>
 
       {/* ✅ Vision & Mission Bottom */}
       <Container maxWidth={false} sx={{ mt: 15, px: { xs: 4, md: 6, lg: 10 } }}>
-        <Box sx={{ mb: 8, textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ mb: 2, fontWeight: 800 }}>
-            Vision & Mission
-          </Typography>
-          <Box sx={{ width: 80, height: 4, bgcolor: 'primary.main', mx: 'auto', borderRadius: 2, mb: 3 }} />
-        </Box>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: '1fr 1fr'
-            },
-            gap: 4
-          }}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
-          <Card sx={{ borderRadius: 4, textAlign: 'center', p: 4 }}>
-            <CardContent>
-              <Typography variant="h4" sx={{ fontWeight: 800, mb: 3, color: 'primary.main' }}>
-                Our Vision
-              </Typography>
-              <Typography color="text.secondary">
-                {visionMission.vision}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box sx={{ mb: 8, textAlign: 'center' }}>
+            <Typography variant="h3" sx={{ mb: 2, fontWeight: 800 }}>
+              Vision & Mission
+            </Typography>
+            <Box sx={{ width: 80, height: 4, bgcolor: 'primary.main', mx: 'auto', borderRadius: 2, mb: 3 }} />
+          </Box>
 
-          <Card sx={{ borderRadius: 4, textAlign: 'center', p: 4 }}>
-            <CardContent>
-              <Typography variant="h4" sx={{ fontWeight: 800, mb: 3, color: 'primary.main' }}>
-                Our Mission
-              </Typography>
-              <Typography color="text.secondary">
-                {visionMission.mission}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: '1fr 1fr'
+              },
+              gap: 4
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card sx={{ borderRadius: 4, textAlign: 'center', p: 4, height: '100%' }}>
+                <CardContent>
+                  <Typography variant="h4" sx={{ fontWeight: 800, mb: 3, color: 'primary.main' }}>
+                    Our Vision
+                  </Typography>
+                  <Typography color="text.secondary">
+                    {visionMission.vision}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card sx={{ borderRadius: 4, textAlign: 'center', p: 4, height: '100%' }}>
+                <CardContent>
+                  <Typography variant="h4" sx={{ fontWeight: 800, mb: 3, color: 'primary.main' }}>
+                    Our Mission
+                  </Typography>
+                  <Typography color="text.secondary">
+                    {visionMission.mission}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </Box>
+        </motion.div>
       </Container>
     </Box>
   );
