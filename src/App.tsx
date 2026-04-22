@@ -11,6 +11,7 @@ import AdminLayout from './components/layout/AdminLayout';
 // Public Pages
 import Home from './pages/public/Home';
 import Login from './pages/public/Login';
+import About from './pages/public/About';
 
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
@@ -61,6 +62,7 @@ const App: React.FC = () => {
             <Route path="/events" element={<div style={{ padding: '100px', textAlign: 'center' }}>Events Page Coming Soon</div>} />
             <Route path="/ministries" element={<div style={{ padding: '100px', textAlign: 'center' }}>Ministries Page Coming Soon</div>} />
             <Route path="/contact" element={<div style={{ padding: '100px', textAlign: 'center' }}>Contact Page Coming Soon</div>} />
+            <Route path="/about" element={<About />} />
 
             {/* Protected Admin Routes */}
             <Route 

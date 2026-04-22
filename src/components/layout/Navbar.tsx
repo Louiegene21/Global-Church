@@ -24,6 +24,7 @@ const navItems = [
   { label: 'Events', path: '/events' },
   { label: 'Ministries', path: '/ministries' },
   { label: 'Contact', path: '/contact' },
+  { label: 'About', path: '/about' },
 ];
 
 const Navbar: React.FC = () => {

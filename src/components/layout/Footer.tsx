@@ -29,9 +29,6 @@ const Footer: React.FC = () => {
                 GLOBAL FAMILY
               </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
-              A Full Gospel Non-denominational Christian Church that believes the church is called as a corporate body of Christ Jesus moving in Apostolic, Prophetic, Evangelism,, Pastoring and Teaching. The church is devoted on reaching out to the lost and training them to become future leaders and ministers of God.
-            </Typography>
             <Box>
               <IconButton color="primary" size="small"><FacebookIcon /></IconButton>
               <IconButton color="primary" size="small"><TwitterIcon /></IconButton>
