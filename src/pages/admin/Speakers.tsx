@@ -28,9 +28,8 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdminSidebar from '../../components/layout/AdminSidebar';
-import { getAxiosInstance } from '../../services/api/apiClient';
 import type { SpeakerType } from '../../types';
+import { adminApi } from '../../services/api/apiClient';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -130,8 +129,8 @@ interface ConfirmDialogProps {
 
 function ConfirmDialog({ open, title, message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-      <DialogTitle fontWeight="bold">{title}</DialogTitle>
+    <Dialog open={open} onClose={onCancel} slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
@@ -244,8 +243,8 @@ function SpeakerFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle fontWeight="bold">{editing ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{editing ? 'Edit Speaker' : 'Add Speaker'}</DialogTitle>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DialogContent>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
@@ -311,8 +310,8 @@ function SpeakerFormDialog({
             />
           </Box>
 
-          <Box mt={4} sx={{ borderTop: '1px solid #eee', pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="caption" fontWeight="900" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary' }}>
+          <Box sx={{ mt: 4, borderTop: '1px solid #eee', pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="caption" sx={{ fontWeight: 900,  textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary' }}>
               Speaker Photo
             </Typography>
             <Button
@@ -333,11 +332,11 @@ function SpeakerFormDialog({
           </Box>
 
           {previewUrl && (
-            <Box mt={2} sx={{ position: 'relative' }}>
+            <Box sx={{ mt: 2, position: 'relative' }}>
               <Typography variant="caption" color="text.secondary">
                 {imageFile ? `Selected: ${imageFile.name}` : 'Current photo'}
               </Typography>
-              <Box mt={1}>
+              <Box sx={{ mt: 1 }}>
                 <img
                   src={previewUrl}
                   alt="Speaker Preview"
@@ -381,7 +380,7 @@ export default function Speakers() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalSpeakers, setTotalSpeakers] = useState(0);
 
-  const axiosInstance = getAxiosInstance();
+  const axiosInstance = adminApi;
 
   const fetchSpeakers = useCallback(
     async (searchQuery: string = '') => {
@@ -479,7 +478,7 @@ export default function Speakers() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" mb={4} sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h4" sx={{ mb: 4,  fontWeight: 'bold' }}>
         Speakers
       </Typography>
 

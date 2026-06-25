@@ -24,8 +24,6 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdminSidebar from '../../components/layout/AdminSidebar';
-import { getAxiosInstance } from '../../services/api/apiClient';
 import type { Event } from '../../types';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -169,8 +167,8 @@ interface ConfirmDialogProps {
 
 function ConfirmDialog({ open, title, message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-      <DialogTitle fontWeight="bold">{title}</DialogTitle>
+    <Dialog open={open} onClose={onCancel} slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
@@ -210,7 +208,7 @@ function EventFormDialog({
     location: '',
   });
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [innerLoading, setInnerLoading] = useState(false);
 
@@ -281,8 +279,8 @@ function EventFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle fontWeight="bold">{editing ? 'Edit Event' : 'Add Event'}</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{editing ? 'Edit Event' : 'Add Event'}</DialogTitle>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DialogContent>
           <TextField
@@ -333,8 +331,8 @@ function EventFormDialog({
             sx={{ mt: 2 }}
           />
 
-          <Box mt={4} sx={{ borderTop: '1px solid #eee', pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="caption" fontWeight="900" sx={{ textTransform: 'uppercase', color: 'text.secondary' }}>
+          <Box sx={{ mt: 4, borderTop: '1px solid #eee', pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="caption" sx={{ fontWeight: 900,  textTransform: 'uppercase', color: 'text.secondary' }}>
               Event Promotional Image
             </Typography>
             <Button variant="contained" component="label" disableElevation sx={{ textTransform: 'none', borderRadius: 1, bgcolor: '#4dabf5' }}>
@@ -344,7 +342,7 @@ function EventFormDialog({
           </Box>
 
           {previewUrl && (
-            <Box mt={2}>
+            <Box sx={{ mt: 2 }}>
               <img src={previewUrl} alt="Preview" style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 8 }} />
             </Box>
           )}
@@ -382,7 +380,7 @@ export default function Events() {
 
   // Simulation of fetching (since we use dummy data)
   const fetchEvents = useCallback(
-    async (searchQuery: string = '') => {
+    async (_searchQuery: string = '') => {
       setLoading(true);
       // Simulate network delay
       setTimeout(() => {
@@ -458,7 +456,7 @@ export default function Events() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" mb={4} sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h4" sx={{ mb: 4,  fontWeight: 'bold' }}>
         Events
       </Typography>
 

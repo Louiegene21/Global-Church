@@ -1,18 +1,5 @@
-export interface Pastor {
-  id: string;
-  name: string;
-  role: string;
-  bio: string;
-  imageUrl: string;
-  socials?: {
-    facebook?: string;
-    twitter?: string;
-    instagram?: string;
-  };
-}
-
 export interface SpeakerType {
-  id: string | number;
+  id: string;
   first_name: string;
   middle_name?: string;
   last_name: string;
@@ -25,18 +12,16 @@ export interface SpeakerType {
 }
 
 export interface SermonType {
-  id: string | number;
+  id: string;
   title: string;
-  speaker_id?: string | number;
-  speaker?: string; // For simple mock data
+  speaker_id?: string;
+  speaker?: string;
   speaker_details?: SpeakerType;
   date: string;
   duration?: string;
   description: string;
   watch_url?: string;
   thumbnail_url?: string;
-  image_url?: string; // Legacy compatibility
-  image_url_address?: string; // Legacy compatibility
   category?: string;
 }
 
@@ -68,12 +53,13 @@ export interface Announcement {
 
 export interface User {
   id: string;
-  username: string;
+  name: string;
+  email: string;
   role: 'admin' | 'user';
 }
 
 export interface MemberType {
-  id: string | number;
+  id: string;
   first_name: string;
   middle_name?: string;
   last_name: string;

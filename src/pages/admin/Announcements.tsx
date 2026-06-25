@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -27,7 +27,6 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdminSidebar from '../../components/layout/AdminSidebar';
 import type { Announcement } from '../../types';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -118,7 +117,7 @@ function AnnouncementTable({
                     label={a.isUrgent ? 'Urgent' : 'Normal'}
                     size="small"
                     color={a.isUrgent ? 'error' : 'primary'}
-                    variant={a.isUrgent ? 'contained' : 'outlined'}
+                    variant={a.isUrgent ? 'filled' : 'outlined'}
                     sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}
                   />
                 </TableCell>
@@ -170,8 +169,8 @@ interface ConfirmDialogProps {
 
 function ConfirmDialog({ open, title, message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-      <DialogTitle fontWeight="bold">{title}</DialogTitle>
+    <Dialog open={open} onClose={onCancel} slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
@@ -262,8 +261,8 @@ function AnnouncementFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle fontWeight="bold">{editing ? 'Edit Announcement' : 'Add Announcement'}</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{editing ? 'Edit Announcement' : 'Add Announcement'}</DialogTitle>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DialogContent>
           <TextField
@@ -286,7 +285,7 @@ function AnnouncementFormDialog({
             />
             <FormControlLabel
               control={<Switch checked={form.isUrgent} onChange={handleUrgentChange} color="error" />}
-              label={<Typography variant="body2" fontWeight="700">Urgent</Typography>}
+              label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Urgent</Typography>}
               sx={{ mr: 0 }}
             />
           </Box>
@@ -395,7 +394,7 @@ export default function Announcements() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" mb={4} sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h4" sx={{ mb: 4,  fontWeight: 'bold' }}>
         Announcements
       </Typography>
 

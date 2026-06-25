@@ -82,7 +82,7 @@ export const MOCK_SERMONS: SermonType[] = [
     speaker: 'David Johnson',
     date: '2026-03-15',
     description: 'Finding freedom from addictions and strongholds through the power of the Holy Spirit.',
-    thumbnail_url: 'https://images.unsplash.com/photo-1454165833267-024f0c608f65?w=800&auto=format&fit=crop',
+    thumbnail_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFoDfk-KXI2fu3WSGxz1-ucwkQoCOuacUguw&s',
     category: 'Freedom',
     watch_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   },

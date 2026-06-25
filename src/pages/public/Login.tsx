@@ -14,7 +14,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { isAxiosError } from 'axios';
 import logo from '../../assets/logo.jpg';
 import { authService } from '../../services/api/authService';
@@ -86,7 +85,7 @@ const Login: React.FC = () => {
             />
           </Box>
           
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
             Admin Access
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
@@ -115,17 +114,19 @@ const Login: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
             <Button

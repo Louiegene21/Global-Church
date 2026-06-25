@@ -157,7 +157,7 @@ const About: React.FC = () => {
             </Typography>
             <Grid container spacing={6}>
               {beliefs.map((belief, index) => (
-                <Grid item xs={12} md={6} key={index}>
+                <Grid size={{ xs: 12, md: 6 }} key={index}>
                   <motion.div
                     initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                     whileInView={{ opacity: 1, x: 0 }}

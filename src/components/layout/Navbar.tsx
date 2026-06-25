@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  IconButton, 
-  Box, 
-  Container, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  useMediaQuery, 
-  useTheme 
+import React, { useState, useEffect } from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  IconButton,
+  Box,
+  Container,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  useMediaQuery,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import CloseIcon from '@mui/icons-material/Close';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import logo from '../../assets/logo.jpg';
 
 const navItems = [
   { label: 'Home', path: '/' },
@@ -29,119 +32,194 @@ const navItems = [
 
 const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', p: 2 }}>
-      <Typography variant="h6" sx={{ my: 2, color: 'primary.main', fontWeight: 'bold' }}>
-        GLOBAL FAMILY
-      </Typography>
-      <List>
+    <Box sx={{ width: 280, height: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+        <IconButton onClick={() => setMobileOpen(false)}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      <Box
+        component={RouterLink}
+        to="/"
+        sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none', mb: 3, px: 1 }}
+      >
+        <Box
+          component="img"
+          src={logo}
+          alt="Global Family Logo"
+          sx={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
+        />
+        <Box sx={{ fontWeight: 800, fontSize: '0.95rem', color: 'primary.main', letterSpacing: '0.05em' }}>
+          GLOBAL FAMILY
+        </Box>
+      </Box>
+
+      <List sx={{ flexGrow: 1 }}>
         {navItems.map((item) => (
-          <ListItem key={item.label} disablePadding component={RouterLink} to={item.path} sx={{ color: 'inherit', textDecoration: 'none' }}>
-            <ListItemText primary={item.label} sx={{ textAlign: 'center' }} />
+          <ListItem key={item.label} disablePadding sx={{ mb: 0.5 }}>
+            <ListItemButton
+              component={RouterLink}
+              to={item.path}
+              selected={isActive(item.path)}
+              sx={{
+                borderRadius: 2,
+                '&.Mui-selected': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                  color: 'primary.main',
+                  fontWeight: 700,
+                },
+              }}
+            >
+              <ListItemText
+                primary={item.label}
+                slotProps={{ primary: { sx: { fontWeight: isActive(item.path) ? 700 : 500 } } }}
+              />
+            </ListItemButton>
           </ListItem>
         ))}
-        <ListItem disablePadding component={RouterLink} to="/login" sx={{ mt: 2 }}>
-          <Button variant="contained" fullWidth>Admin Login</Button>
-        </ListItem>
       </List>
+
+      <Box sx={{ pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+        <Button
+          variant="contained"
+          fullWidth
+          component={RouterLink}
+          to="/login"
+          sx={{ borderRadius: 2 }}
+        >
+          Admin Login
+        </Button>
+      </Box>
     </Box>
   );
 
   return (
     <>
-      <AppBar position="sticky" elevation={0}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          transition: 'box-shadow 0.3s ease, background-color 0.3s ease',
+          ...(scrolled && {
+            boxShadow: '0 2px 20px rgba(0,0,0,0.08)',
+          }),
+        }}
+      >
         <Container maxWidth="lg">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            {/* Logo Placeholder */}
-            <Box 
-              component={RouterLink} 
-              to="/" 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                textDecoration: 'none',
-                gap: 1.5
-              }}
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between', py: 0.5 }}>
+            {/* Logo */}
+            <Box
+              component={RouterLink}
+              to="/"
+              sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', gap: 1.5 }}
             >
-              <Box 
+              <Box
                 component="img"
-                src="/src/assets/logo.jpg"
+                src={logo}
                 alt="Global Family Logo"
-                sx={{ 
-                  width: 45, 
-                  height: 45, 
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
+                sx={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }}
               />
-              <Typography
-                variant="h6"
-                noWrap
+              <Box
                 sx={{
                   fontWeight: 800,
                   letterSpacing: '.05rem',
                   color: 'primary.main',
-                  display: { xs: 'none', sm: 'block' }
+                  fontSize: '1rem',
+                  display: { xs: 'none', sm: 'block' },
+                  fontFamily: theme.typography.fontFamily,
                 }}
               >
                 GLOBAL FAMILY
-              </Typography>
+              </Box>
             </Box>
 
             {/* Desktop Navigation */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5 }}>
               {navItems.map((item) => (
                 <Button
                   key={item.label}
                   component={RouterLink}
                   to={item.path}
-                  sx={{ color: 'text.primary', '&:hover': { color: 'primary.main' } }}
+                  sx={{
+                    color: isActive(item.path) ? 'primary.main' : 'text.primary',
+                    fontWeight: isActive(item.path) ? 700 : 500,
+                    position: 'relative',
+                    px: 1.5,
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: 4,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: isActive(item.path) ? '60%' : '0%',
+                      height: 2,
+                      bgcolor: 'primary.main',
+                      borderRadius: 1,
+                      transition: 'width 0.25s ease',
+                    },
+                    '&:hover': {
+                      color: 'primary.main',
+                      bgcolor: 'transparent',
+                      '&::after': { width: '60%' },
+                    },
+                  }}
                 >
                   {item.label}
                 </Button>
               ))}
-              <Button 
-                variant="outlined" 
+              <Button
+                variant="contained"
                 size="small"
                 component={RouterLink}
                 to="/login"
-                sx={{ ml: 2 }}
+                sx={{ ml: 1.5, borderRadius: 2, px: 2.5 }}
               >
                 Admin
               </Button>
             </Box>
 
-            {/* Mobile Menu Icon */}
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ display: { md: 'none' }, color: 'primary.main' }}
-            >
-              <MenuIcon />
-            </IconButton>
+            {/* Mobile menu toggle */}
+            {isMobile && (
+              <IconButton
+                aria-label="open navigation menu"
+                onClick={() => setMobileOpen(true)}
+                sx={{ color: 'primary.main' }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
           </Toolbar>
         </Container>
       </AppBar>
 
       <Drawer
         variant="temporary"
+        anchor="right"
         open={mobileOpen}
-        onClose={handleDrawerToggle}
+        onClose={() => setMobileOpen(false)}
         ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
-        }}
+        sx={{ display: { xs: 'block', md: 'none' } }}
       >
         {drawer}
       </Drawer>

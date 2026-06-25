@@ -1,14 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Box } from '@mui/material';
 import theme from './theme';
 
-// Layouts
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import AdminLayout from './components/layout/AdminLayout';
 
-// Public Pages
 import Home from './pages/public/Home';
 import Login from './pages/public/Login';
 import About from './pages/public/About';
@@ -18,7 +16,6 @@ import Events from './pages/public/Events';
 import Ministries from './pages/public/Ministries';
 import Contact from './pages/public/Contact';
 
-// Admin Pages
 import Dashboard from './pages/admin/Dashboard';
 import AdminSermons from './pages/admin/Sermons';
 import AdminSpeakers from './pages/admin/Speakers';
@@ -29,23 +26,21 @@ import Announcements from './pages/admin/Announcements';
 
 import { authService } from './services/api/authService';
 
-// Mock Auth Check (Simple placeholder)
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = authService.isAuthenticated();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+const ProtectedRoute = () => {
+  return authService.isAuthenticated() ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
+const PublicLayout = () => {
   const location = useLocation();
-  const isAdminPage = location.pathname.startsWith('/admin');
+  const isLogin = location.pathname === '/login';
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {!isAdminPage && <Navbar />}
+      {!isLogin && <Navbar />}
       <Box component="main" sx={{ flex: 1 }}>
-        {children}
+        <Outlet />
       </Box>
-      {!isAdminPage && <Footer />}
+      {!isLogin && <Footer />}
     </Box>
   );
 };
@@ -55,9 +50,9 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <LayoutWrapper>
-          <Routes>
-            {/* Public Routes */}
+        <Routes>
+          {/* Public layout wraps all public routes */}
+          <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sermons" element={<Sermons />} />
@@ -66,30 +61,22 @@ const App: React.FC = () => {
             <Route path="/ministries" element={<Ministries />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
+          </Route>
 
-            {/* Protected Admin Routes */}
-            <Route 
-              path="/admin/*" 
-              element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Routes>
-                      <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                      <Route path="dashboard" element={<Dashboard />} />
-                      <Route path="sermons" element={<AdminSermons />} />
-                      <Route path="speakers" element={<AdminSpeakers />} />
-                      <Route path="members" element={<Members />} />
-                      <Route path="pastors" element={<Dashboard />} />
-                      <Route path="events" element={<AdminEvents />} />
-                      <Route path="ministries" element={<AdminMinistries />} />
-                      <Route path="announcements" element={<Announcements />} />
-                    </Routes>
-                  </AdminLayout>
-                </ProtectedRoute>
-              } 
-            />
-          </Routes>
-        </LayoutWrapper>
+          {/* Protected admin routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="sermons" element={<AdminSermons />} />
+              <Route path="speakers" element={<AdminSpeakers />} />
+              <Route path="members" element={<Members />} />
+              <Route path="events" element={<AdminEvents />} />
+              <Route path="ministries" element={<AdminMinistries />} />
+              <Route path="announcements" element={<Announcements />} />
+            </Route>
+          </Route>
+        </Routes>
       </Router>
     </ThemeProvider>
   );

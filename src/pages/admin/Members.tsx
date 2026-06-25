@@ -28,8 +28,9 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdminSidebar from '../../components/layout/AdminSidebar';
-import { getAxiosInstance } from '../../services/api/apiClient';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import { adminApi } from '../../services/api/apiClient';
 import type { MemberType } from '../../types';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -44,7 +45,7 @@ interface MemberTableProps {
   members: MemberType[];
   search: string;
   onEdit: (member: MemberType) => void;
-  onDelete: (id: number | string) => void;
+  onDelete: (id: string) => void;
 }
 
 function MemberTable({
@@ -97,7 +98,7 @@ function MemberTable({
                   <IconButton color="primary" onClick={() => onEdit(m)} size="small">
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton color="error" onClick={() => m.id && onDelete(m.id)} size="small">
+                  <IconButton color="error" onClick={() => m.id && onDelete(String(m.id))} size="small">
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -130,8 +131,8 @@ interface ConfirmDialogProps {
 
 function ConfirmDialog({ open, title, message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-      <DialogTitle fontWeight="bold">{title}</DialogTitle>
+    <Dialog open={open} onClose={onCancel} slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
@@ -150,11 +151,14 @@ function ConfirmDialog({ open, title, message, onConfirm, onCancel, loading }: C
 // ==========================================
 // SUB-COMPONENT: MemberFormDialog
 // ==========================================
+type MemberFormData = Omit<MemberType, 'id'> & { id?: string };
+
 interface FormProps {
   open: boolean;
   onClose: () => void;
   editing: MemberType | null;
-  onSave: (data: any) => void | Promise<void>;
+  onSave: (data: MemberFormData) => Promise<void>;
+  saving?: boolean;
 }
 
 function MemberFormDialog({
@@ -162,6 +166,7 @@ function MemberFormDialog({
   onClose,
   editing,
   onSave,
+  saving = false,
 }: FormProps) {
   const [form, setForm] = useState({
     first_name: '',
@@ -201,34 +206,32 @@ function MemberFormDialog({
     }
   }, [open, editing]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleDateChange = (date: any) => {
-    setForm({ ...form, date_of_birth: date ? dayjs(date).format('YYYY-MM-DD') : '' });
+  const handleDateChange = (date: import('dayjs').Dayjs | null) => {
+    setForm((prev) => ({ ...prev, date_of_birth: date ? dayjs(date).format('YYYY-MM-DD') : '' }));
   };
 
   const handleSubmit = async () => {
     setInnerLoading(true);
     try {
-      const data = { ...form };
-      if (editing?.id) {
-        (data as any).id = editing.id;
-      }
+      const data: MemberFormData = { ...form };
+      if (editing?.id) data.id = editing.id;
       await onSave(data);
       onClose();
     } catch (err) {
-      console.error('❌ Error saving member:', err);
+      console.error('Error saving member:', err);
     } finally {
       setInnerLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle fontWeight="bold">{editing ? 'Edit Member' : 'Add Member'}</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{editing ? 'Edit Member' : 'Add Member'}</DialogTitle>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DialogContent>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
@@ -260,9 +263,9 @@ function MemberFormDialog({
         </DialogContent>
 
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={onClose} disabled={innerLoading} color="inherit">Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit} disabled={innerLoading} sx={{ px: 4 }}>
-            {innerLoading ? <CircularProgress size={24} /> : 'Save'}
+          <Button onClick={onClose} disabled={saving || innerLoading} color="inherit">Cancel</Button>
+          <Button variant="contained" onClick={handleSubmit} disabled={saving || innerLoading} sx={{ px: 4 }}>
+            {saving || innerLoading ? <CircularProgress size={22} color="inherit" /> : 'Save'}
           </Button>
         </DialogActions>
       </LocalizationProvider>
@@ -279,191 +282,143 @@ export default function Members() {
   const [openForm, setOpenForm] = useState(false);
   const [editing, setEditing] = useState<MemberType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmConfig, setConfirmConfig] = useState<{
-    title: string;
-    message: string;
-    onConfirm: () => void;
-  }>({ title: '', message: '', onConfirm: () => { } });
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalMembers, setTotalMembers] = useState(0);
 
-  const axiosInstance = getAxiosInstance();
-
   const fetchMembers = useCallback(
-    async (searchQuery: string = '') => {
+    async (q = '') => {
       setLoading(true);
       try {
-        const res = await axiosInstance.get('/members', {
-          params: {
-            page: page + 1,
-            size: rowsPerPage,
-            search: searchQuery.trim(),
-          },
+        const res = await adminApi.get('/members', {
+          params: { page: page + 1, size: rowsPerPage, search: q.trim() },
         });
-        const response = res.data;
-        const memberData = Array.isArray(response) 
-          ? response 
-          : (response && Array.isArray(response.data) ? response.data : []);
-        setMembers(memberData);
-        setTotalMembers(response.total || memberData.length || 0);
+        const raw = res.data;
+        const data: MemberType[] = Array.isArray(raw) ? raw : (raw?.data ?? []);
+        setMembers(data);
+        setTotalMembers(raw?.total ?? data.length);
       } catch (err) {
-        console.error('❌ Failed to fetch members:', err);
+        console.error('Failed to fetch members:', err);
       } finally {
         setLoading(false);
       }
     },
-    [axiosInstance, page, rowsPerPage]
+    [page, rowsPerPage]
   );
 
-  useEffect(() => {
-    fetchMembers(search);
-  }, [fetchMembers, search, page, rowsPerPage]);
+  useEffect(() => { fetchMembers(search); }, [fetchMembers, search, page, rowsPerPage]);
 
-  const handleOpenForm = (member: MemberType | null = null) => {
-    setEditing(member);
-    setOpenForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setOpenForm(false);
-    setEditing(null);
-  };
-
-  const executeSave = async (data: any) => {
-    setLoading(true);
+  const handleSave = async (data: MemberFormData) => {
+    setSaving(true);
     try {
       if (editing) {
-        await axiosInstance.put(`/members/${editing.id}`, data);
+        await adminApi.put(`/members/${editing.id}`, data);
       } else {
-        await axiosInstance.post('/members', data);
+        await adminApi.post('/members', data);
       }
-      handleCloseForm();
+      setOpenForm(false);
+      setEditing(null);
       await fetchMembers(search);
-      setConfirmOpen(false);
     } catch (err) {
-      console.error('❌ Failed to save member:', err);
+      console.error('Failed to save member:', err);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleSave = (data: any) => {
-    setConfirmConfig({
-      title: 'Save Member',
-      message: 'Are you sure you want to save this member?',
-      onConfirm: () => executeSave(data),
-    });
-    setConfirmOpen(true);
-  };
-
-  const executeDelete = async (id: number | string) => {
-    setLoading(true);
+  const handleDeleteConfirm = async () => {
+    if (!deletingId) return;
+    setDeleting(true);
     try {
-      await axiosInstance.delete(`/members/${id}`);
-      await fetchMembers(search);
+      await adminApi.delete(`/members/${deletingId}`);
       setConfirmOpen(false);
+      setDeletingId(null);
+      await fetchMembers(search);
     } catch (err) {
-      console.error('❌ Failed to delete member:', err);
+      console.error('Failed to delete member:', err);
     } finally {
-      setLoading(false);
+      setDeleting(false);
     }
-  };
-
-  const handleDelete = (id: number | string) => {
-    setConfirmConfig({
-      title: 'Delete Member',
-      message: 'Are you sure you want to delete this member?',
-      onConfirm: () => executeDelete(id),
-    });
-    setConfirmOpen(true);
   };
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" mb={4} sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h4" sx={{ fontWeight: 800,  mb: 1 }}>
         Members
       </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+        Manage church member records and information.
+      </Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, mt: 2 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: '6px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              width: 450,
-              borderRadius: 3,
-              border: '1px solid #e0e0e0',
-              bgcolor: 'white',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-            }}
-          >
-            <InputBase
-              sx={{ ml: 1, flex: 1, fontSize: '0.95rem' }}
-              placeholder="Search members..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(0);
-              }}
-            />
-          </Paper>
-          <Button
-            variant="contained"
-            onClick={() => handleOpenForm()}
-            sx={{
-              borderRadius: 1,
-              px: 4,
-              height: 48,
-              fontWeight: 'bold',
-              textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)',
-            }}
-          >
-            Add Member
-          </Button>
-        </Box>
-
-        <MemberTable
-          members={members}
-          search={search}
-          onEdit={handleOpenForm}
-          onDelete={handleDelete}
-          loading={loading}
-        />
-
-        <TablePagination
-          component="div"
-          count={totalMembers}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            px: 2, py: 0.75,
+            display: 'flex', alignItems: 'center', gap: 1,
+            width: 420, borderRadius: 3,
+            border: '1px solid #e2e8f0',
+            bgcolor: 'white',
           }}
-          rowsPerPageOptions={[5, 10, 25]}
-          sx={{ mt: 2 }}
-        />
-
-        <MemberFormDialog
-          open={openForm}
-          onClose={handleCloseForm}
-          onSave={handleSave}
-          editing={editing}
-        />
-
-        <ConfirmDialog
-          open={confirmOpen}
-          title={confirmConfig.title}
-          message={confirmConfig.message}
-          onConfirm={confirmConfig.onConfirm}
-          onCancel={() => setConfirmOpen(false)}
-          loading={loading}
-        />
+        >
+          <SearchIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+          <InputBase
+            sx={{ flex: 1, fontSize: '0.9375rem' }}
+            placeholder="Search members..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+          />
+        </Paper>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => { setEditing(null); setOpenForm(true); }}
+          sx={{ borderRadius: 2, px: 3, height: 44, fontWeight: 700 }}
+        >
+          Add Member
+        </Button>
       </Box>
-    );
+
+      <MemberTable
+        members={members}
+        search={search}
+        onEdit={(m) => { setEditing(m); setOpenForm(true); }}
+        onDelete={(id) => { setDeletingId(id); setConfirmOpen(true); }}
+        loading={loading}
+      />
+
+      <TablePagination
+        component="div"
+        count={totalMembers}
+        page={page}
+        onPageChange={(_, p) => setPage(p)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+        rowsPerPageOptions={[5, 10, 25]}
+        sx={{ mt: 2 }}
+      />
+
+      <MemberFormDialog
+        open={openForm}
+        onClose={() => { setOpenForm(false); setEditing(null); }}
+        onSave={handleSave}
+        editing={editing}
+        saving={saving}
+      />
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Member"
+        message="Are you sure you want to delete this member? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => { setConfirmOpen(false); setDeletingId(null); }}
+        loading={deleting}
+      />
+    </Box>
+  );
 }

@@ -28,7 +28,7 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
   const [loadingSpeakers, setLoadingSpeakers] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url_address || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.thumbnail_url || null);
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -37,7 +37,6 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
     duration: initialData?.duration || '',
     description: initialData?.description || '',
     watch_url: initialData?.watch_url || '',
-    image_url_address: initialData?.image_url_address || '',
   });
 
   useEffect(() => {
@@ -100,7 +99,7 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ p: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
           {initialData ? 'Edit Sermon' : 'Add New Sermon'}
         </Typography>
         <IconButton onClick={onClose} size="small">
@@ -109,9 +108,9 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
                 label="Sermon Title"
@@ -121,7 +120,7 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth required>
                 <InputLabel>Speaker</InputLabel>
                 <Select
@@ -133,13 +132,13 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
                 >
                   {speakers.map((s) => (
                     <MenuItem key={s.id} value={s.id}>
-                      {s.name}
+                      {s.first_name} {s.last_name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 label="Date"
@@ -147,11 +146,11 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
                 type="date"
                 value={formData.date}
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
+                slotProps={{ inputLabel: { shrink: true } }}
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 label="Duration (e.g., 45:10)"
@@ -161,7 +160,7 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 label="Video Link (YouTube/Vimeo)"
@@ -171,7 +170,7 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
                 required
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
                 label="Description"
@@ -186,7 +185,7 @@ const SermonForm: React.FC<SermonFormProps> = ({ initialData, onSave, onClose })
           </Grid>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Typography variant="subtitle2" gutterBottom>
             Sermon Thumbnail
           </Typography>

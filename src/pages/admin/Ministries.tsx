@@ -24,9 +24,8 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AdminSidebar from '../../components/layout/AdminSidebar';
-import { getAxiosInstance } from '../../services/api/apiClient';
 import type { Ministry } from '../../types';
+import { adminApi } from '../../services/api/apiClient';
 
 // ==========================================
 // SUB-COMPONENT: MinistryTable
@@ -130,8 +129,8 @@ interface ConfirmDialogProps {
 
 function ConfirmDialog({ open, title, message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
-      <DialogTitle fontWeight="bold">{title}</DialogTitle>
+    <Dialog open={open} onClose={onCancel} slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
@@ -228,8 +227,8 @@ function MinistryFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle fontWeight="bold">{editing ? 'Edit Ministry' : 'Add Ministry'}</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>{editing ? 'Edit Ministry' : 'Add Ministry'}</DialogTitle>
       <DialogContent>
         <TextField
           margin="dense"
@@ -253,8 +252,8 @@ function MinistryFormDialog({
           onChange={handleChange}
         />
 
-        <Box mt={4} sx={{ borderTop: '1px solid #eee', pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="caption" fontWeight="900" sx={{ textTransform: 'uppercase', color: 'text.secondary' }}>
+        <Box sx={{ mt: 4, borderTop: '1px solid #eee', pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="caption" sx={{ fontWeight: 900,  textTransform: 'uppercase', color: 'text.secondary' }}>
             Ministry Image
           </Typography>
           <Button variant="contained" component="label" disableElevation sx={{ textTransform: 'none', borderRadius: 1, bgcolor: '#4dabf5' }}>
@@ -264,7 +263,7 @@ function MinistryFormDialog({
         </Box>
 
         {previewUrl && (
-          <Box mt={2}>
+          <Box sx={{ mt: 2 }}>
             <img src={previewUrl} alt="Preview" style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 8 }} />
           </Box>
         )}
@@ -300,7 +299,7 @@ export default function Ministries() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalMinistries, setTotalMinistries] = useState(0);
 
-  const axiosInstance = getAxiosInstance();
+  const axiosInstance = adminApi;
 
   const fetchMinistries = useCallback(
     async (searchQuery: string = '') => {
@@ -398,7 +397,7 @@ export default function Ministries() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" mb={4} sx={{ fontWeight: 'bold' }}>
+      <Typography variant="h4" sx={{ mb: 4,  fontWeight: 'bold' }}>
         Ministries
       </Typography>
 

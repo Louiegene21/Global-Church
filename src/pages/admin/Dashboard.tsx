@@ -15,7 +15,7 @@ import {
   ListItemText,
   Chip,
   Button,
-  Grid
+  Grid,
 } from '@mui/material';
 import SermonIcon from '@mui/icons-material/Mic';
 import PeopleIcon from '@mui/icons-material/People';
@@ -23,16 +23,12 @@ import MinistryIcon from '@mui/icons-material/Handyman';
 import GroupIcon from '@mui/icons-material/Group';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import EventIcon from '@mui/icons-material/Event';
-import AnnouncementIcon from '@mui/icons-material/Campaign';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { getAxiosInstance } from '../../services/api/apiClient';
-import dayjs from 'dayjs';
+import { adminApi } from '../../services/api/apiClient';
 import { useNavigate } from 'react-router-dom';
+import type { MemberType, SermonType, SpeakerType } from '../../types';
 
-// ==========================================
-// SUB-COMPONENT: StatCard
-// ==========================================
+// ── StatCard ─────────────────────────────────────────────────────────────────
 interface StatCardProps {
   label: string;
   value: string | number;
@@ -48,44 +44,44 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon, color, trend, l
     sx={{
       borderRadius: 4,
       border: '1px solid #eef2f6',
-      transition: 'all 0.3s ease',
       height: '100%',
-      width: '100%',
-      '&:hover': {
-        boxShadow: '0 10px 20px rgba(0,0,0,0.05)',
-        transform: 'translateY(-2px)'
-      }
+      transition: 'all 0.25s ease',
+      '&:hover': { boxShadow: '0 10px 30px rgba(0,0,0,0.07)', transform: 'translateY(-2px)' },
     }}
   >
     <CardContent sx={{ p: 3 }}>
-      <Stack direction="row" spacing={3} alignItems="center">
+      <Stack direction="row" spacing={2.5} sx={{ alignItems: 'center' }}>
         <Box
           sx={{
-            p: 2,
+            p: 1.75,
             borderRadius: 3,
-            bgcolor: `${color}15`,
-            color: color,
+            bgcolor: `${color}18`,
+            color,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}
         >
           {icon}
         </Box>
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="body2" color="text.secondary" fontWeight="600" sx={{ textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontWeight: 700,  textTransform: 'uppercase', letterSpacing: 0.8, display: 'block', mb: 0.5 }}
+          >
             {label}
           </Typography>
           {loading ? (
-            <Skeleton width="60%" height={40} />
+            <Skeleton width="55%" height={38} />
           ) : (
-            <Stack direction="row" alignItems="baseline" spacing={1}>
-              <Typography variant="h4" fontWeight="800">
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
+              <Typography variant="h4" sx={{ fontWeight: 800 }}>
                 {value}
               </Typography>
               {trend && (
-                <Typography variant="caption" color="success.main" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <TrendingUpIcon fontSize="inherit" /> {trend}
+                <Typography variant="caption" color="success.main" sx={{ fontWeight: 700,  display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                  <TrendingUpIcon sx={{ fontSize: 14 }} /> {trend}
                 </Typography>
               )}
             </Stack>
@@ -96,218 +92,253 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon, color, trend, l
   </Card>
 );
 
-// ==========================================
-// MAIN COMPONENT: Dashboard
-// ==========================================
-const Dashboard: React.FC = () => {
+// ── SectionHeader — module-level to avoid re-creation on every render ─────────
+const SectionHeader: React.FC<{ title: string; link: string }> = ({ title, link }) => {
   const navigate = useNavigate();
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800 }}>
+        {title}
+      </Typography>
+      <Button size="small" endIcon={<ArrowForwardIcon />} onClick={() => navigate(link)} sx={{ fontWeight: 700 }}>
+        View All
+      </Button>
+    </Box>
+  );
+};
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+interface DashboardStats {
+  sermons: number;
+  members: number;
+  speakers: number;
+  ministries: number;
+}
+
+interface RecentData {
+  members: MemberType[];
+  sermons: SermonType[];
+  speakers: SpeakerType[];
+}
+
+const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    sermons: 0,
-    members: 0,
-    speakers: 0,
-    ministries: 0,
-    events: 0,
-    announcements: 0
-  });
-
-  const [recentData, setRecentData] = useState({
-    members: [] as any[],
-    sermons: [] as any[],
-    speakers: [] as any[],
-    ministries: [] as any[],
-    events: [] as any[],
-    announcements: [] as any[]
-  });
-
-  const axiosInstance = getAxiosInstance();
+  const [stats, setStats] = useState<DashboardStats>({ sermons: 0, members: 0, speakers: 0, ministries: 0 });
+  const [recentData, setRecentData] = useState<RecentData>({ members: [], sermons: [], speakers: [] });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // Parallel fetching for all modules
       const [sermonsRes, membersRes, speakersRes, ministriesRes] = await Promise.all([
-        axiosInstance.get('/sermons', { params: { size: 5 } }),
-        axiosInstance.get('/members', { params: { size: 10 } }),
-        axiosInstance.get('/speakers', { params: { size: 5 } }),
-        axiosInstance.get('/ministries', { params: { size: 5 } })
+        adminApi.get('/sermons', { params: { size: 5 } }),
+        adminApi.get('/members', { params: { size: 10 } }),
+        adminApi.get('/speakers', { params: { size: 5 } }),
+        adminApi.get('/ministries', { params: { size: 5 } }),
       ]);
 
-      const getCount = (res: any) => res.data.total || (Array.isArray(res.data) ? res.data.length : 0);
-      const getList = (res: any) => Array.isArray(res.data) ? res.data : (res.data.data || []);
+      const getCount = (res: { data: { total?: number } | unknown[] }) =>
+        (res.data as { total?: number }).total ??
+        (Array.isArray(res.data) ? res.data.length : 0);
+
+      const getList = <T,>(res: { data: T[] | { data: T[] } }): T[] =>
+        Array.isArray(res.data) ? res.data : ((res.data as { data: T[] }).data ?? []);
 
       setStats({
         sermons: getCount(sermonsRes),
         members: getCount(membersRes),
         speakers: getCount(speakersRes),
         ministries: getCount(ministriesRes),
-        events: 3, // Dummy count for now
-        announcements: 3 // Dummy count for now
       });
 
       setRecentData({
-        sermons: getList(sermonsRes).slice(0, 3),
-        members: getList(membersRes).slice(0, 5),
-        speakers: getList(speakersRes).slice(0, 4),
-        ministries: getList(ministriesRes).slice(0, 4),
-        events: [], // Would fetch if real
-        announcements: [] // Would fetch if real
+        sermons: (getList<SermonType>(sermonsRes)).slice(0, 3),
+        members: (getList<MemberType>(membersRes)).slice(0, 5),
+        speakers: (getList<SpeakerType>(speakersRes)).slice(0, 4),
       });
-
     } catch (err) {
-      console.error('❌ Failed to fetch dashboard data:', err);
+      console.error('Failed to fetch dashboard data:', err);
     } finally {
       setLoading(false);
     }
-  }, [axiosInstance]);
+  }, []);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const SectionHeader = ({ title, link }: { title: string, link: string }) => (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-      <Typography variant="h6" fontWeight="800">
-        {title}
-      </Typography>
-      <Button 
-        size="small" 
-        endIcon={<ArrowForwardIcon />} 
-        onClick={() => navigate(link)}
-        sx={{ fontWeight: 'bold', textTransform: 'none' }}
-      >
-        View All
-      </Button>
-    </Box>
-  );
-
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-        Dashboard
-      </Typography>
-      
-      {/* 1. Statistics Row */}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'space-between' }}>
-        {[
-          { label: 'Members', value: stats.members, icon: <GroupIcon fontSize="large" />, color: '#2196f3', trend: '4.2%' },
-          { label: 'Sermons', value: stats.sermons, icon: <SermonIcon fontSize="large" />, color: '#9c27b0', trend: '2.1%' },
-          { label: 'Speakers', value: stats.speakers, icon: <PeopleIcon fontSize="large" />, color: '#2e7d32' },
-          { label: 'Ministries', value: stats.ministries, icon: <MinistryIcon fontSize="large" />, color: '#ed6c02' },
-        ].map((item) => (
-          <Box key={item.label} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 24px)', md: '1 1 calc(25% - 24px)' }, minWidth: '220px' }}>
-            <StatCard {...item} loading={loading} />
-          </Box>
-        ))}
+      <Box>
+        <Typography variant="h4" sx={{ fontWeight: 800 }}>
+          Dashboard
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          Welcome back — here's what's happening at Global Family Church.
+        </Typography>
       </Box>
 
-      {/* 2. Primary Management Row (Members & Sermons) */}
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 3 }}>
-        {/* Latest Members */}
-        <Box sx={{ flex: 1.5 }}>
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 5, border: '1px solid #eef2f6' }}>
-            <SectionHeader title="Recent Member Activity" link="/admin/members" />
+      {/* Stats */}
+      <Grid container spacing={3}>
+        {[
+          { label: 'Members', value: stats.members, icon: <GroupIcon />, color: '#2196f3', trend: '+4.2%' },
+          { label: 'Sermons', value: stats.sermons, icon: <SermonIcon />, color: '#9c27b0', trend: '+2.1%' },
+          { label: 'Speakers', value: stats.speakers, icon: <PeopleIcon />, color: '#2e7d32' },
+          { label: 'Ministries', value: stats.ministries, icon: <MinistryIcon />, color: '#ed6c02' },
+        ].map((item) => (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={item.label}>
+            <StatCard {...item} loading={loading} />
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Members & Sermons */}
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid #eef2f6', height: '100%' }}>
+            <SectionHeader title="Recent Members" link="/admin/members" />
             <Divider sx={{ mb: 2 }} />
-            {loading ? <Skeleton height={200} /> : (
+            {loading ? (
+              <Skeleton height={220} variant="rounded" />
+            ) : (
               <List disablePadding>
                 {recentData.members.map((m, idx) => (
                   <React.Fragment key={m.id}>
-                    <ListItem sx={{ px: 0, py: 2 }}>
+                    <ListItem sx={{ px: 0, py: 1.75 }}>
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: '#eff6ff', color: '#3b82f6', fontWeight: 'bold' }}>
-                          {(m.first_name?.[0] || 'M').toUpperCase()}
+                        <Avatar sx={{ bgcolor: '#eff6ff', color: '#3b82f6', fontWeight: 800 }}>
+                          {(m.first_name?.[0] ?? 'M').toUpperCase()}
                         </Avatar>
                       </ListItemAvatar>
-                      <ListItemText 
-                        primary={<Typography variant="body1" fontWeight="700">{m.first_name} {m.last_name}</Typography>}
-                        secondary={`Registry: ${m.gender || 'Active Member'}`}
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                            {m.first_name} {m.last_name}
+                          </Typography>
+                        }
+                        secondary={m.gender ?? 'Active Member'}
                       />
                       <Chip label="New" size="small" variant="outlined" color="primary" />
                     </ListItem>
                     {idx < recentData.members.length - 1 && <Divider component="li" />}
                   </React.Fragment>
                 ))}
+                {recentData.members.length === 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+                    No members yet.
+                  </Typography>
+                )}
               </List>
             )}
           </Paper>
-        </Box>
+        </Grid>
 
-        {/* Latest Sermons */}
-        <Box sx={{ flex: 1 }}>
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 5, border: '1px solid #eef2f6' }}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid #eef2f6', height: '100%' }}>
             <SectionHeader title="Latest Sermons" link="/admin/sermons" />
             <Divider sx={{ mb: 2 }} />
-            {loading ? <Skeleton height={200} /> : (
+            {loading ? (
+              <Skeleton height={220} variant="rounded" />
+            ) : (
               <Stack spacing={2.5}>
-                {recentData.sermons.map(s => (
+                {recentData.sermons.map((s) => (
                   <Box key={s.id} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: '#f1f5f9' }}><SermonIcon color="secondary" /></Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight="700" noWrap sx={{ maxWidth: 200 }}>{s.title}</Typography>
-                      <Typography variant="caption" color="text.secondary">{s.date}</Typography>
+                    <Box sx={{ p: 1.25, borderRadius: 2, bgcolor: '#f1f5f9', flexShrink: 0 }}>
+                      <SermonIcon color="primary" fontSize="small" />
+                    </Box>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>
+                        {s.title}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(s.date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </Typography>
                     </Box>
                   </Box>
                 ))}
+                {recentData.sermons.length === 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+                    No sermons yet.
+                  </Typography>
+                )}
               </Stack>
             )}
           </Paper>
-        </Box>
-      </Box>
+        </Grid>
+      </Grid>
 
-      {/* 3. Secondary Modules Row (Speakers & Ministries) */}
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 3 }}>
-        {/* Speakers */}
-        <Box sx={{ flex: 1 }}>
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 5, border: '1px solid #eef2f6' }}>
+      {/* Speakers & Status */}
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid #eef2f6' }}>
             <SectionHeader title="Active Speakers" link="/admin/speakers" />
             <Divider sx={{ mb: 3 }} />
-            <Grid container spacing={2}>
-              {loading ? <Skeleton width="100%" height={100} /> : recentData.speakers.map(s => (
-                <Grid item xs={6} key={s.id}>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar sx={{ width: 40, height: 40 }} />
-                    <Box>
-                      <Typography variant="body2" fontWeight="700" noWrap>{s.first_name}</Typography>
-                      <Typography variant="caption" color="text.secondary">Speaker</Typography>
-                    </Box>
-                  </Stack>
-                </Grid>
-              ))}
-            </Grid>
+            {loading ? (
+              <Skeleton height={120} variant="rounded" />
+            ) : (
+              <Grid container spacing={2}>
+                {recentData.speakers.map((s) => (
+                  <Grid size={{ xs: 6 }} key={s.id}>
+                    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+                      <Avatar sx={{ width: 38, height: 38, bgcolor: '#eff6ff', color: '#3b82f6', fontWeight: 800 }}>
+                        {(s.first_name?.[0] ?? 'S').toUpperCase()}
+                      </Avatar>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>
+                          {s.first_name} {s.last_name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          {s.role ?? 'Speaker'}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Grid>
+                ))}
+                {recentData.speakers.length === 0 && (
+                  <Grid size={{ xs: 12 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+                      No speakers yet.
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            )}
           </Paper>
-        </Box>
+        </Grid>
 
-        {/* System Status */}
-        <Box sx={{ flex: 1 }}>
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 5, border: '1px solid #eef2f6', bgcolor: 'white' }}>
-            <Typography variant="h6" fontWeight="800" sx={{ mb: 3 }}>
-              Network & Announcements
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid #eef2f6' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800,  mb: 3 }}>
+              System Status
             </Typography>
             <Divider sx={{ mb: 3 }} />
-            <Stack spacing={2}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <CheckCircleIcon color="success" sx={{ fontSize: 20 }} />
-                  <Typography variant="body2" fontWeight="600">Events & Announcements</Typography>
+            <Stack spacing={2.5}>
+              {[
+                { label: 'Events & Announcements', status: 'Active' },
+                { label: 'Media & Sermons', status: 'Active' },
+                { label: 'Member Registry', status: 'Active' },
+              ].map(({ label, status }) => (
+                <Box key={label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <CheckCircleIcon color="success" sx={{ fontSize: 18 }} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {label}
+                    </Typography>
+                  </Box>
+                  <Chip label={status} size="small" color="success" variant="outlined" />
                 </Box>
-                <Chip label="Sync Active" size="small" color="success" variant="outlined" />
-              </Box>
-              <Typography variant="caption" color="text.secondary">
-                You have 3 upcoming events and 2 urgent announcements currently active.
-              </Typography>
-              <Button 
-                variant="outlined" 
-                fullWidth 
-                sx={{ mt: 2, borderRadius: 2, textTransform: 'none' }}
-                onClick={() => navigate('/admin/announcements')}
-              >
-                Manage Notices
-              </Button>
+              ))}
             </Stack>
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{ mt: 3, borderRadius: 2 }}
+              onClick={() => window.location.href = '/admin/announcements'}
+            >
+              Manage Notices
+            </Button>
           </Paper>
-        </Box>
-      </Box>
-
+        </Grid>
+      </Grid>
     </Box>
   );
 };

@@ -1,53 +1,41 @@
 import React from 'react';
-import { Container, Grid, Box } from '@mui/material';
+import { Container, Box, Grid } from '@mui/material';
+import { motion } from 'framer-motion';
 import PublicHero from '../../components/common/PublicHero';
 import DataCard from '../../components/common/DataCard';
 import { MOCK_MINISTRIES } from '../../services/api/mockData';
 
 const Ministries: React.FC = () => {
   return (
-    <Box sx={{ pb: 10, bgcolor: 'background.default', minHeight: '100vh' }}>
-      <PublicHero 
-        title="Our Ministries" 
+    <Box sx={{ pb: 12, bgcolor: 'background.default', minHeight: '100vh' }}>
+      <PublicHero
+        title="Our Ministries"
         subtitle="Discover the different ways you can get involved, serve, and grow within our church family."
         image="https://images.unsplash.com/photo-1454165833267-024f0c608f65?w=1600&auto=format&fit=crop"
       />
 
-      <Container maxWidth={false} sx={{ px: 2, mt: 2 }}>
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: 3, 
-            justifyContent: 'flex-start',
-            width: '100%'
-          }}
-        >
-          {MOCK_MINISTRIES.map((ministry) => (
-            <Box 
-              key={ministry.id}
-              sx={{ 
-                flex: {
-                  xs: '1 1 100%',
-                  sm: '1 1 calc(50% - 24px)',
-                  md: '1 1 calc(33.333% - 24px)',
-                  lg: '1 1 calc(25% - 24px)'
-                },
-                maxWidth: {
-                  lg: 'calc(25% - 24px)'
-                }
-              }}
-            >
-              <DataCard
-                image={ministry.imageUrl}
-                title={ministry.name}
-                description={ministry.description}
-                actionLabel="Explore Ministry"
-                onAction={() => console.log('View ministry')}
-              />
-            </Box>
+      <Container maxWidth="lg">
+        <Grid container spacing={3}>
+          {MOCK_MINISTRIES.map((ministry, index) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={ministry.id}>
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.4) }}
+                style={{ height: '100%' }}
+              >
+                <DataCard
+                  image={ministry.imageUrl}
+                  title={ministry.name}
+                  description={ministry.description}
+                  actionLabel="Learn More"
+                  onAction={() => window.location.href = '/contact'}
+                />
+              </motion.div>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </Container>
     </Box>
   );

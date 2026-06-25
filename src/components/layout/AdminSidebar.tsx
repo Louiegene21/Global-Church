@@ -17,7 +17,8 @@ import {
   DialogContentText,
   DialogActions,
   Avatar,
-  Fade
+  Fade,
+  Chip,
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SermonIcon from '@mui/icons-material/Mic';
@@ -30,11 +31,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/api/authService';
+import logo from '../../assets/logo.jpg';
 
 const drawerWidth = 280;
 
 const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
+  { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
   { text: 'Members', icon: <GroupIcon />, path: '/admin/members' },
   { text: 'Speakers', icon: <PeopleIcon />, path: '/admin/speakers' },
   { text: 'Sermons', icon: <SermonIcon />, path: '/admin/sermons' },
@@ -56,12 +58,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ mobileOpen = false, onClose
   const [userName, setUserName] = useState('Admin User');
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setUserName(parsed.name || parsed.username || 'Admin User');
-      } catch (e) {}
+    const user = authService.getUser();
+    if (user?.name) {
+      setUserName(user.name);
     }
   }, []);
 
@@ -71,93 +70,112 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ mobileOpen = false, onClose
   };
 
   const drawerContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg, #1565c0 0%, #1976d2 100%)', color: 'white' }}>
-      {/* Header Section */}
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'linear-gradient(180deg, #1565c0 0%, #1976d2 60%, #1e88e5 100%)',
+        color: 'white',
+      }}
+    >
+      {/* Header */}
       <Toolbar sx={{ display: 'flex', alignItems: 'center', gap: 2, pt: 3, pb: 2, px: 3 }}>
         <Avatar
-          src="/src/assets/logo.jpg"
-          sx={{
-            width: 45,
-            height: 45,
-            border: '2px solid rgba(255,255,255,0.8)',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-          }}
+          src={logo}
+          alt="Church Logo"
+          sx={{ width: 44, height: 44, border: '2px solid rgba(255,255,255,0.8)' }}
         />
         <Box>
-          <Typography variant="subtitle1" fontWeight="800" sx={{ letterSpacing: 0.5, lineHeight: 1.2 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 800,  letterSpacing: 0.5, lineHeight: 1.2, color: 'white' }}>
             GLOBAL FAMILY
           </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.8, fontWeight: 500, textTransform: 'uppercase' }}>
-            Church Admin
+          <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 1 }}>
+            Admin Panel
           </Typography>
         </Box>
       </Toolbar>
 
-      <Divider sx={{ mx: 3, my: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
+      <Divider sx={{ mx: 3, bgcolor: 'rgba(255,255,255,0.12)' }} />
 
-      {/* User Profile Section */}
+      {/* User profile */}
       <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 32, height: 32 }}>
+        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.18)', width: 36, height: 36 }}>
           <AccountCircleIcon fontSize="small" />
         </Avatar>
         <Box>
-          <Typography variant="body2" fontWeight="bold">
+          <Typography variant="body2" sx={{ fontWeight: 700,  color: 'white', lineHeight: 1.2 }}>
             {userName}
           </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.7 }}>
-            Standard Admin
-          </Typography>
+          <Chip
+            label="Admin"
+            size="small"
+            sx={{
+              height: 18,
+              fontSize: '0.65rem',
+              bgcolor: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              fontWeight: 700,
+              mt: 0.5,
+            }}
+          />
         </Box>
       </Box>
 
-      <Box sx={{ flexGrow: 1, overflow: 'auto', px: 2, mt: 1 }}>
-        <Typography variant="caption" sx={{ px: 2, mb: 1, display: 'block', opacity: 0.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+      {/* Nav Items */}
+      <Box sx={{ flexGrow: 1, overflow: 'auto', px: 2 }}>
+        <Typography
+          variant="caption"
+          sx={{ px: 2, mb: 1, display: 'block', opacity: 0.45, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.2 }}
+        >
           Navigation
         </Typography>
-        <List>
+        <List disablePadding>
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
+            const isActive =
+              location.pathname === item.path ||
+              (item.path !== '/admin/dashboard' && location.pathname.startsWith(item.path));
             return (
               <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                 <ListItemButton
                   onClick={() => handleNavClick(item.path)}
                   selected={isActive}
                   sx={{
-                    borderRadius: '12px',
+                    borderRadius: '10px',
                     py: 1.2,
                     px: 2,
                     transition: 'all 0.2s ease',
-                    position: 'relative',
                     '&.Mui-selected': {
-                      bgcolor: 'rgba(255, 255, 255, 0.15)',
-                      '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.2)' },
+                      bgcolor: 'rgba(255,255,255,0.16)',
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
                       '&::before': {
                         content: '""',
                         position: 'absolute',
                         left: 0,
                         top: '20%',
                         bottom: '20%',
-                        width: '4px',
+                        width: 4,
                         backgroundColor: 'white',
                         borderRadius: '0 4px 4px 0',
-                      }
+                      },
                     },
                     '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.08)',
-                      transform: 'translateX(4px)'
-                    }
+                      bgcolor: 'rgba(255,255,255,0.08)',
+                      transform: 'translateX(3px)',
+                    },
+                    position: 'relative',
                   }}
                 >
-                  <ListItemIcon sx={{ color: 'white', minWidth: 40, opacity: isActive ? 1 : 0.7 }}>
+                  <ListItemIcon sx={{ color: 'white', minWidth: 40, opacity: isActive ? 1 : 0.65 }}>
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText
                     primary={item.text}
-                    primaryTypographyProps={{
+                    slotProps={{ primary: { sx: {
                       fontSize: '0.9rem',
                       fontWeight: isActive ? 700 : 500,
-                      letterSpacing: 0.2
-                    }}
+                      color: 'white',
+                    } } }}
                   />
                 </ListItemButton>
               </ListItem>
@@ -166,32 +184,28 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ mobileOpen = false, onClose
         </List>
       </Box>
 
-      <Box sx={{ p: 2, mt: 'auto', pb: 4 }}>
+      {/* Logout */}
+      <Box sx={{ p: 2, pb: 3 }}>
         <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)', mb: 2 }} />
         <ListItemButton
           onClick={() => setOpenLogout(true)}
           sx={{
-            borderRadius: '12px',
+            borderRadius: '10px',
             py: 1.5,
             color: 'white',
             '&:hover': {
-              bgcolor: 'rgba(255, 61, 0, 0.15)',
-              '& .logout-icon': { color: '#ff5252' },
-              '& .logout-text span': { color: '#ff5252' }
-            }
+              bgcolor: 'rgba(255,80,80,0.15)',
+              '& .MuiListItemIcon-root': { color: '#ff8a80' },
+              '& .MuiListItemText-primary': { color: '#ff8a80' },
+            },
           }}
         >
-          <ListItemIcon className="logout-icon" sx={{ color: 'white', minWidth: 40, transition: 'color 0.2s' }}>
+          <ListItemIcon sx={{ color: 'rgba(255,255,255,0.7)', minWidth: 40, transition: 'color 0.2s' }}>
             <LogoutIcon />
           </ListItemIcon>
           <ListItemText
-            className="logout-text"
-            primary="Logout Session"
-            primaryTypographyProps={{
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              transition: 'color 0.2s'
-            }}
+            primary="Logout"
+            slotProps={{ primary: { sx: { fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.85)', transition: 'color 0.2s' } } }}
           />
         </ListItemButton>
       </Box>
@@ -201,20 +215,18 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ mobileOpen = false, onClose
   return (
     <>
       <Drawer
-        variant={isMobile ? "temporary" : "permanent"}
+        variant={isMobile ? 'temporary' : 'permanent'}
         open={isMobile ? mobileOpen : true}
         onClose={onClose}
         ModalProps={{ keepMounted: true }}
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
+          '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '4px 0 10px rgba(0,0,0,0.05)',
-            bgcolor: '#1976d2',
-            backgroundImage: 'linear-gradient(180deg, #1565c0 0%, #1976d2 100%)',
+            border: 'none',
+            boxShadow: '4px 0 24px rgba(0,0,0,0.08)',
           },
         }}
       >
@@ -224,28 +236,24 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ mobileOpen = false, onClose
       <Dialog
         open={openLogout}
         onClose={() => setOpenLogout(false)}
-        TransitionComponent={Fade}
-        transitionDuration={400}
-        PaperProps={{ sx: { borderRadius: 3, p: 1, boxShadow: '0 10px 40px rgba(0,0,0,0.1)' } }}
+        slots={{ transition: Fade }}
+        slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}
       >
-        <DialogTitle sx={{ fontWeight: 'bold', pb: 1 }}>Confirm Logout</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Confirm Logout</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: 'text.secondary' }}>
+          <DialogContentText>
             Are you sure you want to end your administration session? You will need to log in again to access the dashboard.
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-          <Button onClick={() => setOpenLogout(false)} color="inherit" sx={{ fontWeight: 'bold', textTransform: 'none' }}>
+          <Button onClick={() => setOpenLogout(false)} color="inherit">
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              setOpenLogout(false);
-              authService.logout();
-            }}
+            onClick={() => { setOpenLogout(false); authService.logout(); }}
             variant="contained"
             color="error"
-            sx={{ borderRadius: 2, px: 3, fontWeight: 'bold', textTransform: 'none', boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)' }}
+            sx={{ borderRadius: 2, px: 3 }}
             autoFocus
           >
             Logout

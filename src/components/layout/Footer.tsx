@@ -1,86 +1,160 @@
 import React from 'react';
-import { Box, Container, Grid, Typography, Link, IconButton, Divider } from '@mui/material';
+import { Box, Container, Grid, Typography, Link, IconButton, Divider, Stack } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Link as RouterLink } from 'react-router-dom';
+import logo from '../../assets/logo.jpg';
+import { CHURCH_INFO } from '../../constants/church';
+
+const quickLinks = [
+  { label: 'Home', path: '/' },
+  { label: 'Sermons', path: '/sermons' },
+  { label: 'Events', path: '/events' },
+  { label: 'Ministries', path: '/ministries' },
+  { label: 'About Us', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+];
 
 const Footer: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: 'white', pt: 8, pb: 4, borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
+    <Box sx={{ bgcolor: '#0d1b2a', color: 'rgba(255,255,255,0.85)', pt: 8, pb: 4 }}>
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1.5 }}>
+        <Grid container spacing={5}>
+          {/* Brand & Socials */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2.5, gap: 1.5 }}>
               <Box
                 component="img"
-                src="/src/assets/logo.jpg"
+                src={logo}
                 alt="Global Family Logo"
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
+                sx={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
               />
-              <Typography variant="h6" color="primary.main" fontWeight="800">
+              <Typography variant="h6" sx={{ fontWeight: 800,  color: 'white', letterSpacing: '0.05em' }}>
                 GLOBAL FAMILY
               </Typography>
             </Box>
-            <Box>
-              <IconButton color="primary" size="small"><FacebookIcon /></IconButton>
-              <IconButton color="primary" size="small"><TwitterIcon /></IconButton>
-              <IconButton color="primary" size="small"><InstagramIcon /></IconButton>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" gutterBottom fontWeight="700">
-              Contact Info
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, mb: 3, maxWidth: 280 }}>
+              A Full Gospel Non-denominational Christian Church devoted to reaching the lost and training future leaders and ministers of God.
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <LocationOnIcon fontSize="small" color="primary" />
-                <Typography variant="body2" color="text.secondary">
-                  STC Building, Capitolville Back Gate, Brgy. Mandalagan, Bacolod CIty, Philippines, 6100
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <PhoneIcon fontSize="small" color="primary" />
-                <Typography variant="body2" color="text.secondary">
-                  +1 (234) 567-8900
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <EmailIcon fontSize="small" color="primary" />
-                <Typography variant="body2" color="text.secondary">
-                  info@globalfamily.church
-                </Typography>
-              </Box>
-            </Box>
+            <Stack direction="row" spacing={0.5}>
+              <IconButton
+                href={CHURCH_INFO.socials.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="small"
+                sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#1877f2', bgcolor: 'rgba(24,119,242,0.1)' } }}
+              >
+                <FacebookIcon />
+              </IconButton>
+              <IconButton
+                href={CHURCH_INFO.socials.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="small"
+                sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#1da1f2', bgcolor: 'rgba(29,161,242,0.1)' } }}
+              >
+                <TwitterIcon />
+              </IconButton>
+              <IconButton
+                href={CHURCH_INFO.socials.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="small"
+                sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#e1306c', bgcolor: 'rgba(225,48,108,0.1)' } }}
+              >
+                <InstagramIcon />
+              </IconButton>
+              <IconButton
+                href={CHURCH_INFO.socials.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="small"
+                sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#ff0000', bgcolor: 'rgba(255,0,0,0.1)' } }}
+              >
+                <YouTubeIcon />
+              </IconButton>
+            </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', md: 'flex-end' } }}>
-            <Box>
-              <Typography variant="h6" gutterBottom fontWeight="700" sx={{ textAlign: { md: 'right' } }}>
-                Quick Links
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: { xs: 'flex-start', md: 'flex-end' } }}>
-                <Link href="/" color="inherit" underline="none" sx={{ '&:hover': { color: 'primary.main' } }}>Home</Link>
-                <Link href="/sermons" color="inherit" underline="none" sx={{ '&:hover': { color: 'primary.main' } }}>Sermons</Link>
-                <Link href="/events" color="inherit" underline="none" sx={{ '&:hover': { color: 'primary.main' } }}>Events</Link>
-                <Link href="/ministries" color="inherit" underline="none" sx={{ '&:hover': { color: 'primary.main' } }}>Ministries</Link>
+          {/* Service Times */}
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700, color: 'white', mb: 2.5 }}>
+              Service Schedule
+            </Typography>
+            <Stack spacing={2}>
+              {CHURCH_INFO.serviceTimes.map((s, i) => (
+                <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                  <AccessTimeIcon sx={{ fontSize: 18, color: 'primary.light', mt: 0.2 }} />
+                  <Box>
+                    <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
+                      {s.day} — {s.label}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>
+                      {s.time}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+          </Grid>
+
+          {/* Contact & Links */}
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700, color: 'white', mb: 2.5 }}>
+              Get in Touch
+            </Typography>
+            <Stack spacing={2} sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                <LocationOnIcon sx={{ fontSize: 18, color: 'primary.light', mt: 0.2, flexShrink: 0 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
+                  {CHURCH_INFO.address}
+                </Typography>
               </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <PhoneIcon sx={{ fontSize: 18, color: 'primary.light', flexShrink: 0 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {CHURCH_INFO.phone}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <EmailIcon sx={{ fontSize: 18, color: 'primary.light', flexShrink: 0 }} />
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {CHURCH_INFO.email}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  component={RouterLink}
+                  to={link.path}
+                  underline="none"
+                  sx={{
+                    color: 'rgba(255,255,255,0.55)',
+                    fontSize: '0.8125rem',
+                    '&:hover': { color: 'primary.light' },
+                    transition: 'color 0.2s',
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </Box>
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: 4 }} />
+        <Divider sx={{ my: 4, borderColor: 'rgba(255,255,255,0.08)' }} />
 
-        <Typography variant="body2" color="text.secondary" align="center">
-          © {new Date().getFullYear()} Global Family Jesus Christ the Redeemer Church. All rights reserved.
+        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.35)', textAlign: 'center' }}>
+          © {new Date().getFullYear()} {CHURCH_INFO.name}. All rights reserved.
         </Typography>
       </Container>
     </Box>
